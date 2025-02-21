@@ -1,0 +1,53 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [ "development", "production" ]
+
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at 00:00 UTC
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  build:
+    if: github.event_name == 'pull_request'
+    name: Build on PR
+    runs-on: ubuntu-latest
+      
+    steps:
+      - name: Docker Login
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          provenance: false
+          platforms: linux/arm64
+          tags: ${{ env.IMAGE_TAG }}
+
+  delete-stale-branches:
+    if: github.event_name == 'schedule'
+    name: Delete Stale Branches (Sunday Cron)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete branches inactive for more than 60 days
+        uses: crs-k/stale-branches@v6.0.2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 59
+          days-before-delete: 60
+          dry-run: false
+          branches-filter-regex: '^(?!main$|production$|development$).*'
