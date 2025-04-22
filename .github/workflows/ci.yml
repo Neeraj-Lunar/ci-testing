@@ -4,7 +4,7 @@ on:
     push:
       branches: [development]  # Trigger on pushes to main
     schedule:
-      - cron: '*/5 * * * *'  # Every Sunday at 00:00 UTC
+      - cron: '0 * * * *'  # Every Sunday at 00:00 UTC
     workflow_dispatch:  # Allow manual trigger
   
 
