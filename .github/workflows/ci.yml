@@ -3,8 +3,8 @@ name: CI Pipeline
 on:
     push:
       branches: [main]  # Trigger on pushes to main
-  #   schedule:
-      # - cron: '0 0 * * 0'  # Every Sunday at 00:00 UTC
+    schedule:
+      - cron: '*/1 * * * *'  # Every Sunday at 00:00 UTC
     workflow_dispatch:  # Allow manual trigger
   
 
