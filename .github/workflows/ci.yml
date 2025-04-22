@@ -1,0 +1,26 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]  # Trigger on pushes to main
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at 00:00 UTC
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write  # Needed for branch deletion
+
+jobs:
+  delete-stale-branches:
+    name: Delete Stale Branches
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete branches inactive for more than 60 days
+        uses: crs-k/stale-branches@v6.0.2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 59
+          days-before-delete: 60
+          dry-run: false
+          branches-filter-regex: '^(?!main$|production$|development$).*' #new
